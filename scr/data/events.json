@@ -1,0 +1,9 @@
+[
+    { "message": "You got sick and had to rest.", "effect": { "health": -10 }, "chance": 0.1 },
+    { "message": "You won a small lottery!", "effect": { "money": 100 }, "chance": 0.05 },
+    { "message": "You had a wonderfully memorable day with a friend!", "effect": { "fun": 10, "relationships": 5 }, "chance": 0.15 },
+    { "message": "You learned something new unexpectedly!", "effect": { "intelligence": 5 }, "chance": 0.15 },
+    { "message": "You had a falling out with a friend.", "effect": { "relationships": -10 }, "chance": 0.1 },
+    { "message": "You found $20 on the street!", "effect": { "money": 20 }, "chance": 0.1 },
+    { "message": "You felt a sudden burst of inspiration.", "effect": { "fun": 10 }, "chance": 0.1 }
+]

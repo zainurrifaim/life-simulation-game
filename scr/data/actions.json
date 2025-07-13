@@ -1,0 +1,52 @@
+{
+    "Kindergarten": [
+        { "name": "Play with Friends", "cost": 0, "energyCost": 20, "effect": { "fun": 10, "relationships": 5 } },
+        { "name": "Buy Drawing Book", "cost": 10, "energyCost": 10, "effect": { "intelligence": 5 } },
+        { "name": "Nap", "cost": 0, "energyCost": -30, "effect": { "health": 5 } }
+    ],
+    "Elementary School": [
+        { "name": "Join Sports Team", "cost": 15, "energyCost": 30, "effect": { "health": 10, "fun": 5, "relationships": 5 } },
+        { "name": "Study with Friends", "cost": 0, "energyCost": 25, "effect": { "intelligence": 5, "relationships": 5 } },
+        { "name": "Watch TV", "cost": 0, "energyCost": 10, "effect": { "fun": 5 } }
+    ],
+    "Middle School": [
+        { "name": "Go to a Party", "cost": 10, "energyCost": 40, "effect": { "fun": 15, "relationships": 10, "health": -5 } },
+        { "name": "Part-Time Job", "cost": 0, "energyCost": 50, "effect": { "money": 20, "fun": -5 } },
+        { "name": "Study Hard", "cost": 0, "energyCost": 30, "effect": { "intelligence": 10, "fun": -5 } }
+    ],
+    "High School": [
+        { "name": "Focus on Studies", "cost": 0, "energyCost": 40, "effect": { "intelligence": 15, "fun": -10 } },
+        { "name": "Part-Time Job", "cost": 0, "energyCost": 60, "effect": { "money": 30, "fun": -5 } },
+        { "name": "Hang out with Friends", "cost": 15, "energyCost": 30, "effect": { "fun": 20, "relationships": 15 } }
+    ],
+    "College": [
+        { "name": "Major in Computer Science", "cost": 0, "energyCost": 100, "effect": { "intelligence": 20, "fun": -10 }, "career": "Software Developer" },
+        { "name": "Major in Pre-Med", "cost": 0, "energyCost": 100, "effect": { "intelligence": 25, "fun": -15 }, "career": "Doctor" },
+        { "name": "Major in Fine Arts", "cost": 0, "energyCost": 100, "effect": { "intelligence": 15, "fun": -5 }, "career": "Artist" }
+    ],
+    "College_Majored": [
+        { "name": "Study for Exams", "cost": 0, "energyCost": 50, "effect": { "intelligence": 15, "fun": -10 } },
+        { "name": "Go to a College Party", "cost": 20, "energyCost": 40, "effect": { "fun": 20, "relationships": 10, "health": -5 } },
+        { "name": "Join a Study Group", "cost": 0, "energyCost": 30, "effect": { "intelligence": 10, "relationships": 5 } }
+    ],
+    "Software Developer": [
+        { "name": "Work on a side-project", "cost": 0, "energyCost": 50, "effect": { "money": 150, "intelligence": 10, "fun": -10 } },
+        { "name": "Attend a Tech Conference", "cost": 100, "energyCost": 30, "effect": { "relationships": 10, "intelligence": 5 } },
+        { "name": "Ask for Promotion", "cost": 0, "energyCost": 50, "effect": {}, "special": "seekPromotion" }
+    ],
+    "Doctor": [
+        { "name": "Work Extra Shifts", "cost": 0, "energyCost": 70, "effect": { "money": 250, "health": -15, "fun": -15 } },
+        { "name": "Attend Medical Conference", "cost": 300, "energyCost": 40, "effect": { "relationships": 10, "intelligence": 10 } },
+        { "name": "Ask for Promotion", "cost": 0, "energyCost": 60, "effect": {}, "special": "seekPromotion" }
+    ],
+    "Artist": [
+        { "name": "Sell Your Art", "cost": 0, "energyCost": 40, "effect": { "money": 100, "fun": 10 } },
+        { "name": "Visit a Museum", "cost": 20, "energyCost": 20, "effect": { "intelligence": 5, "fun": 10 } },
+        { "name": "Ask for Promotion", "cost": 0, "energyCost": 30, "effect": {}, "special": "seekPromotion" }
+    ],
+    "Unemployed": [
+        { "name": "Do Odd Jobs", "cost": 0, "energyCost": 60, "effect": { "money": 50, "fun": -10 } },
+        { "name": "Search for a Better Job", "cost": 0, "energyCost": 30, "effect": { "intelligence": 5, "fun": -5 }, "special": "findJob" },
+        { "name": "Watch TV", "cost": 0, "energyCost": 10, "effect": { "fun": 5 } }
+    ]
+}

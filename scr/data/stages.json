@@ -1,0 +1,9 @@
+{
+    "Kindergarten": { "minAge": 5, "maxAge": 6, "image": "scr/assets/images/kindergarten.png" },
+    "Elementary School": { "minAge": 7, "maxAge": 12, "image": "scr/assets/images/elementary.png" },
+    "Middle School": { "minAge": 13, "maxAge": 15, "image": "scr/assets/images/middleschool.png" },
+    "High School": { "minAge": 16, "maxAge": 18, "image": "scr/assets/images/highschool.png" },
+    "College": { "minAge": 19, "maxAge": 22, "image": "scr/assets/images/college.png" },
+    "Working Adult": { "minAge": 23, "maxAge": 64, "image": "scr/assets/images/working.png" },
+    "Retirement": { "minAge": 65, "image": "scr/assets/images/retirement.png" }
+}

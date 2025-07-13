@@ -1,0 +1,35 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+#message-box {
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.progress-bar-container {
+    background-color: #e5e7eb; /* gray-200 */
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.5s ease-in-out;
+}
+
+@keyframes flash-green {
+    50% { background-color: #d1fae5; } /* green-100 */
+}
+
+@keyframes flash-red {
+    50% { background-color: #fee2e2; } /* red-100 */
+}
+
+.stat-increase {
+    animation: flash-green 0.5s ease-in-out;
+}
+
+.stat-decrease {
+    animation: flash-red 0.5s ease-in-out;
+}
