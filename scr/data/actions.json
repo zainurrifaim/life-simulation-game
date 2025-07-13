@@ -12,12 +12,15 @@
     "Middle School": [
         { "name": "Go to a Party", "cost": 10, "energyCost": 40, "effect": { "fun": 15, "relationships": 10, "health": -5 } },
         { "name": "Part-Time Job", "cost": 0, "energyCost": 50, "effect": { "money": 20, "fun": -5 } },
-        { "name": "Study Hard", "cost": 0, "energyCost": 30, "effect": { "intelligence": 10, "fun": -5 } }
+        { "name": "Study Hard", "cost": 0, "energyCost": 30, "effect": { "intelligence": 10, "fun": -5 } },
+        { "name": "Eat Junk Food", "special": "eatJunkFood" }
     ],
     "High School": [
         { "name": "Focus on Studies", "cost": 0, "energyCost": 40, "effect": { "intelligence": 15, "fun": -10 } },
         { "name": "Part-Time Job", "cost": 0, "energyCost": 60, "effect": { "money": 30, "fun": -5 } },
-        { "name": "Hang out with Friends", "cost": 15, "energyCost": 30, "effect": { "fun": 20, "relationships": 15 } }
+        { "name": "Hang out with Friends", "cost": 15, "energyCost": 30, "effect": { "fun": 20, "relationships": 15 } },
+        { "name": "Go to the Gym", "special": "goToGym" },
+        { "name": "Eat Junk Food", "special": "eatJunkFood" }
     ],
     "College": [
         { "name": "Major in Computer Science", "cost": 0, "energyCost": 100, "effect": { "intelligence": 20, "fun": -10 }, "career": "Software Developer" },
@@ -27,26 +30,57 @@
     "College_Majored": [
         { "name": "Study for Exams", "cost": 0, "energyCost": 50, "effect": { "intelligence": 15, "fun": -10 } },
         { "name": "Go to a College Party", "cost": 20, "energyCost": 40, "effect": { "fun": 20, "relationships": 10, "health": -5 } },
-        { "name": "Join a Study Group", "cost": 0, "energyCost": 30, "effect": { "intelligence": 10, "relationships": 5 } }
+        { "name": "Join a Study Group", "cost": 0, "energyCost": 30, "effect": { "intelligence": 10, "relationships": 5 } },
+        { "name": "Go to the Gym", "special": "goToGym" },
+        { "name": "Eat Junk Food", "special": "eatJunkFood" }
     ],
     "Software Developer": [
         { "name": "Work on a side-project", "cost": 0, "energyCost": 50, "effect": { "money": 150, "intelligence": 10, "fun": -10 } },
         { "name": "Attend a Tech Conference", "cost": 100, "energyCost": 30, "effect": { "relationships": 10, "intelligence": 5 } },
-        { "name": "Ask for Promotion", "cost": 0, "energyCost": 50, "effect": {}, "special": "seekPromotion" }
+        { "name": "Ask for Promotion", "special": "seekPromotion" },
+        { "name": "Take a Vacation", "special": "takeVacation" },
+        { "name": "Go to the Gym", "special": "goToGym" },
+        { "name": "Go to Casino", "special": "gamble" },
+        { "name": "Eat Junk Food", "special": "eatJunkFood" }
     ],
     "Doctor": [
         { "name": "Work Extra Shifts", "cost": 0, "energyCost": 70, "effect": { "money": 250, "health": -15, "fun": -15 } },
         { "name": "Attend Medical Conference", "cost": 300, "energyCost": 40, "effect": { "relationships": 10, "intelligence": 10 } },
-        { "name": "Ask for Promotion", "cost": 0, "energyCost": 60, "effect": {}, "special": "seekPromotion" }
+        { "name": "Ask for Promotion", "special": "seekPromotion" },
+        { "name": "Take a Vacation", "special": "takeVacation" },
+        { "name": "Go to the Gym", "special": "goToGym" },
+        { "name": "Go to Casino", "special": "gamble" },
+        { "name": "Eat Junk Food", "special": "eatJunkFood" }
     ],
     "Artist": [
         { "name": "Sell Your Art", "cost": 0, "energyCost": 40, "effect": { "money": 100, "fun": 10 } },
         { "name": "Visit a Museum", "cost": 20, "energyCost": 20, "effect": { "intelligence": 5, "fun": 10 } },
-        { "name": "Ask for Promotion", "cost": 0, "energyCost": 30, "effect": {}, "special": "seekPromotion" }
+        { "name": "Ask for Promotion", "special": "seekPromotion" },
+        { "name": "Take a Vacation", "special": "takeVacation" },
+        { "name": "Go to the Gym", "special": "goToGym" },
+        { "name": "Go to Casino", "special": "gamble" },
+        { "name": "Eat Junk Food", "special": "eatJunkFood" }
     ],
     "Unemployed": [
         { "name": "Do Odd Jobs", "cost": 0, "energyCost": 60, "effect": { "money": 50, "fun": -10 } },
-        { "name": "Search for a Better Job", "cost": 0, "energyCost": 30, "effect": { "intelligence": 5, "fun": -5 }, "special": "findJob" },
+        { "name": "Search for a Better Job", "special": "findJob" },
+        { "name": "Watch TV", "cost": 0, "energyCost": 10, "effect": { "fun": 5 } },
+        { "name": "Take a Vacation", "special": "takeVacation" },
+        { "name": "Go to the Gym", "special": "goToGym" },
+        { "name": "Go to Casino", "special": "gamble" },
+        { "name": "Eat Junk Food", "special": "eatJunkFood" }
+    ],
+    "Retirement": [
+        { "name": "Travel the World", "cost": 500, "energyCost": 100, "effect": { "fun": 50, "relationships": 20 } },
+        { "name": "Volunteer", "cost": 0, "energyCost": 30, "effect": { "relationships": 10, "fun": 5 } },
+        { "name": "Gardening", "cost": 0, "energyCost": 20, "effect": { "fun": 10 } },
         { "name": "Watch TV", "cost": 0, "energyCost": 10, "effect": { "fun": 5 } }
+    ],
+    "Cashier": [
+        { "name": "Work Extra Hours", "cost": 0, "energyCost": 50, "effect": { "money": 100, "fun": -10 } },
+        { "name": "Take a Vacation", "special": "takeVacation" },
+        { "name": "Go to the Gym", "special": "goToGym" },
+        { "name": "Go to Casino", "special": "gamble" },
+        { "name": "Eat Junk Food", "special": "eatJunkFood" }
     ]
 }
