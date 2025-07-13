@@ -1,24 +1,24 @@
 {
     "Software Developer": { "image": "scr/assets/images/developer.png", "degreeRequired": "Software Developer", "levels": [
-        { "title": "Junior Developer", "salary": 700, "requirements": { "intelligence": 70 } },
-        { "title": "Senior Developer", "salary": 1200, "requirements": { "intelligence": 85, "age": 30 } },
-        { "title": "Lead Developer", "salary": 2000, "requirements": { "intelligence": 95, "relationships": 70 } }
+        { "title": "Junior Developer", "salary": 7000, "requirements": { "intelligence": 70 } },
+        { "title": "Senior Developer", "salary": 12000, "requirements": { "intelligence": 85, "age": 30 } },
+        { "title": "Lead Developer", "salary": 20000, "requirements": { "intelligence": 95, "relationships": 70 } }
     ]},
     "Doctor": { "image": "scr/assets/images/doctor.png", "degreeRequired": "Doctor", "levels": [
-        { "title": "Medical Resident", "salary": 900, "requirements": { "intelligence": 85, "health": 60 } },
-        { "title": "Attending Physician", "salary": 1500, "requirements": { "intelligence": 90, "age": 35 } },
-        { "title": "Chief of Medicine", "salary": 2500, "requirements": { "intelligence": 95, "health": 70 } }
+        { "title": "Medical Resident", "salary": 9000, "requirements": { "intelligence": 85, "health": 60 } },
+        { "title": "Attending Physician", "salary": 15000, "requirements": { "intelligence": 90, "age": 35 } },
+        { "title": "Chief of Medicine", "salary": 25000, "requirements": { "intelligence": 95, "health": 70 } }
     ]},
     "Artist": { "image": "scr/assets/images/artist.png", "degreeRequired": "Artist", "levels": [
-         { "title": "Aspiring Artist", "salary": 400, "requirements": { "intelligence": 50, "fun": 60 } },
-         { "title": "Established Artist", "salary": 800, "requirements": { "fun": 75, "age": 32 } },
-         { "title": "Renowned Artist", "salary": 1500, "requirements": { "fun": 90, "relationships": 75 } }
+         { "title": "Aspiring Artist", "salary": 4000, "requirements": { "intelligence": 50, "fun": 60 } },
+         { "title": "Established Artist", "salary": 8000, "requirements": { "fun": 75, "age": 32 } },
+         { "title": "Renowned Artist", "salary": 15000, "requirements": { "fun": 90, "relationships": 75 } }
     ]},
     "Cashier": {
         "image": "scr/assets/images/cashier.png",
         "levels": [
-            { "title": "Cashier", "salary": 200, "requirements": { "intelligence": 20 } },
-            { "title": "Shift Supervisor", "salary": 350, "requirements": { "intelligence": 30, "relationships": 40 } }
+            { "title": "Cashier", "salary": 2000, "requirements": { "intelligence": 20 } },
+            { "title": "Shift Supervisor", "salary": 3500, "requirements": { "intelligence": 30, "relationships": 40 } }
         ]
     },
     "Unemployed": { "image": "scr/assets/images/unemployed.png", "levels": [

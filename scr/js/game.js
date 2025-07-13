@@ -15,6 +15,8 @@ const getInitialState = () => ({
     // New System States
     hasPartner: false,
     isMarried: false,
+    children: [], 
+    assets: [], 
     gamblingStreak: 0,
     gamblingAddiction: false,
     fitnessLevel: 0,
@@ -40,7 +42,10 @@ const elements = {
     stageImage: document.getElementById('stage-image'),
     stageName: document.getElementById('stage-name'),
     statusDisplay: document.getElementById('status-display'),
+    financialSummaryDisplay: document.createElement('div'),
 };
+elements.statusDisplay.after(elements.financialSummaryDisplay);
+elements.financialSummaryDisplay.className = 'mt-4 text-left space-y-1';
 
 // --- HELPER FUNCTIONS ---
 const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
@@ -65,7 +70,7 @@ function showMessage(text, type = 'info') {
     }, 4000);
 }
 
-// --- NEW ACTION HANDLERS ---
+// --- ACTION HANDLERS ---
 
 const actionHandlers = {
     goToGym: () => {
@@ -172,7 +177,7 @@ const actionHandlers = {
             showMessage("You put yourself out there, but didn't connect with anyone this time.");
         }
         updateGameState(updates);
-        updateActions(); // Refresh actions after state change
+        updateActions();
     },
     propose: () => {
         const cost = 1000;
@@ -194,7 +199,7 @@ const actionHandlers = {
             showMessage("They weren't ready for that step. The relationship is over.", "error");
         }
         updateGameState(updates);
-        updateActions(); // Refresh actions after state change
+        updateActions();
     },
     divorce: () => {
         if (gameState.energy < 80) {
@@ -211,7 +216,54 @@ const actionHandlers = {
             fun: gameState.fun - 40,
             health: gameState.health - 10
         });
-        updateActions(); // Refresh actions after state change
+        updateActions();
+    },
+    haveChild: () => {
+        const cost = 500;
+        const energyCost = 60;
+        if (gameState.money < cost || gameState.energy < energyCost) {
+            showMessage("You don't have the financial or emotional energy to have a child right now.", "error");
+            return;
+        }
+        showMessage("Welcome to the world, little one! Your family has grown.", "success");
+        const newChildren = [...gameState.children, { age: 0 }];
+        updateGameState({
+            ...gameState,
+            money: gameState.money - cost,
+            energy: gameState.energy - energyCost,
+            fun: gameState.fun + 20,
+            relationships: gameState.relationships + 10,
+            children: newChildren
+        });
+        updateActions();
+    },
+    buyAsset: (assetId) => {
+        const asset = gameData.assets[assetId];
+        if (!asset || gameState.money < asset.cost) {
+            showMessage(`You can't afford the ${asset.name}.`, "error");
+            return;
+        }
+
+        let updates = {
+            ...gameState,
+            money: gameState.money - asset.cost
+        };
+
+        // If it's a house, remove any other housing assets (can't own two houses or rent while owning)
+        if (asset.type === 'housing') {
+            updates.assets = gameState.assets.filter(id => gameData.assets[id].type !== 'housing');
+        }
+        
+        // Add the new asset
+        updates.assets.push(assetId);
+        
+        for (const effect in asset.effect) {
+            updates[effect] = (updates[effect] || 0) + asset.effect[effect];
+        }
+
+        showMessage(`You have purchased a ${asset.name.split('a ')[1]}!`, "success");
+        updateGameState(updates);
+        updateActions();
     },
     findJob: () => {
         const availableCareers = Object.keys(gameData.careers).filter(careerName => {
@@ -220,12 +272,12 @@ const actionHandlers = {
             const careerData = gameData.careers[careerName];
             if (!careerData.levels?.length) return false;
     
-            // Check for degree requirement
-            if (careerData.degreeRequired && (!gameState.flags.graduated || gameState.career !== careerData.degreeRequired)) {
-                return false;
+            if (careerData.degreeRequired) {
+                if (!gameState.flags.graduated || gameState.career !== careerData.degreeRequired) {
+                    return false;
+                }
             }
     
-            // Check stat requirements for the entry-level position
             const requirements = careerData.levels[0].requirements;
             for (const requirement in requirements) {
                 if (gameState[requirement] < requirements[requirement]) {
@@ -249,6 +301,36 @@ const actionHandlers = {
         } else {
             showMessage("You searched for a job, but couldn't find one you're qualified for yet.", 'info');
         }
+    },
+    seekPromotion: () => {
+        if (!gameState.career || gameState.career === 'Unemployed') {
+            showMessage("You don't have a career to get a promotion in.", "error");
+            return;
+        }
+
+        const careerData = gameData.careers[gameState.career];
+        const nextLevel = gameState.careerLevel + 1;
+
+        if (!careerData.levels || nextLevel >= careerData.levels.length) {
+            showMessage("You are already at the top of your career path!", "info");
+            return;
+        }
+
+        const promotionReqs = careerData.levels[nextLevel].requirements;
+        const unmetRequirements = Object.keys(promotionReqs).filter(req => gameState[req] < promotionReqs[req]);
+
+        if (unmetRequirements.length === 0) {
+            const newTitle = careerData.levels[nextLevel].title;
+            showMessage(`Congratulations! You've been promoted to ${newTitle}!`, 'success');
+            updateGameState({
+                ...gameState,
+                careerLevel: nextLevel
+            });
+            updateActions();
+        } else {
+            const reqText = unmetRequirements.map(req => `${req.charAt(0).toUpperCase() + req.slice(1)}`).join(', ');
+            showMessage(`You were not promoted. You need to improve: ${reqText}.`, "error");
+        }
     }
 };
 
@@ -264,6 +346,7 @@ function setupStatDisplays() {
         { name: 'Relationships', key: 'relationships', color: 'red' },
         { name: 'Energy', key: 'energy', color: 'indigo' },
         { name: 'Money', key: 'money', color: 'yellow' },
+        { name: 'Children', key: 'children', color: 'blue' },
     ];
 
     elements.statsContainer.innerHTML = '';
@@ -280,7 +363,6 @@ function setupStatDisplays() {
 }
 
 function updateDisplay() {
-    // Clamp values before displaying
     Object.keys(gameState).forEach(key => {
         if (['health', 'fun', 'intelligence', 'relationships', 'energy'].includes(key)) {
             gameState[key] = clamp(gameState[key], 0, 100);
@@ -288,20 +370,24 @@ function updateDisplay() {
     });
     gameState.money = Math.max(0, Math.floor(gameState.money));
 
-    // Update text values for all stats
     document.getElementById('stat-age').textContent = gameState.age;
     document.getElementById('stat-money').textContent = `$${gameState.money}`;
+    document.getElementById('stat-children').textContent = gameState.children.length;
     ['health', 'fun', 'intelligence', 'relationships', 'energy'].forEach(key => {
         document.getElementById(`stat-${key}`).textContent = gameState[key];
     });
 
-    // Update stage display
     const currentCareerData = gameData.careers[gameState.career];
     const currentStageData = gameData.stages[gameState.stage];
-    elements.stageImage.src = (currentCareerData || currentStageData)?.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-    elements.stageName.textContent = currentCareerData?.levels?.[gameState.careerLevel]?.title || gameState.stage;
+    
+    if (gameState.stage === 'Retirement') {
+        elements.stageImage.src = currentStageData?.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+        elements.stageName.textContent = gameState.stage;
+    } else {
+        elements.stageImage.src = (currentCareerData || currentStageData)?.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+        elements.stageName.textContent = currentCareerData?.levels?.[gameState.careerLevel]?.title || gameState.stage;
+    }
 
-    // Update Status Display
     elements.statusDisplay.innerHTML = '';
     let statusHTML = '';
     if (gameState.isMarried) {
@@ -318,6 +404,60 @@ function updateDisplay() {
         statusHTML += `<div class="flex items-center text-sm bg-green-100 text-green-800 p-2 rounded-lg mt-2"><span class="font-bold mr-2">Health:</span> Poor Diet</div>`;
     }
     elements.statusDisplay.innerHTML = statusHTML;
+
+    elements.financialSummaryDisplay.innerHTML = '';
+    let summaryHTML = '<h3 class="text-lg font-semibold text-gray-800 mb-2">Yearly Financial Summary</h3>';
+    let totalIncome = 0;
+    let totalExpenses = 0;
+    
+    const salary = (gameState.career && gameData.careers[gameState.career]) ? gameData.careers[gameState.career].levels[gameState.careerLevel].salary : 0;
+    if (salary > 0) {
+        summaryHTML += `<div class="expense-item text-sm"><span class="text-gray-600">Salary:</span><span class="font-medium text-green-600">+$${salary}</span></div>`;
+        totalIncome += salary;
+    }
+
+    const addExpense = (label, amount) => {
+        if (amount > 0) {
+            summaryHTML += `<div class="expense-item text-sm"><span class="text-gray-600">${label}:</span><span class="font-medium text-red-600">-$${amount}</span></div>`;
+            totalExpenses += amount;
+        }
+    };
+    
+    for (const expenseId in gameData.expenses) {
+        const expense = gameData.expenses[expenseId];
+        try {
+            if (eval(expense.condition)) {
+                let amount = 0;
+                if (typeof expense.amount === 'string' && expense.amount.includes('%')) {
+                    const percentage = parseFloat(expense.amount) / 100;
+                    amount = Math.floor(salary * percentage);
+                } else if (expense.per === 'child') {
+                    amount = expense.amount * gameState.children.length;
+                } else {
+                    amount = expense.amount;
+                }
+                addExpense(expense.description, amount);
+            }
+        } catch (e) {
+            console.error("Error evaluating expense condition:", e);
+        }
+    }
+
+    gameState.assets.forEach(assetId => {
+        const asset = gameData.assets[assetId];
+        addExpense(`${asset.name.replace(/Buy a |Rent an /,'')} Upkeep`, asset.upkeep);
+    });
+
+
+    if (totalIncome > 0 || totalExpenses > 0) {
+        const netChange = totalIncome - totalExpenses;
+        const netColor = netChange >= 0 ? 'text-green-700' : 'text-red-700';
+        const netSign = netChange >= 0 ? '+' : '-';
+        summaryHTML += `<hr class="my-1"><div class="expense-item font-bold"><span class="text-gray-800">Net:</span><span class="${netColor}">${netSign}$${Math.abs(netChange)}</span></div>`;
+    } else {
+        summaryHTML += `<p class="text-sm text-gray-500">No significant income or expenses.</p>`;
+    }
+    elements.financialSummaryDisplay.innerHTML = summaryHTML;
 }
 
 function applyStatChangeAnimation(key, change) {
@@ -325,6 +465,14 @@ function applyStatChangeAnimation(key, change) {
     if (!container) return;
     container.classList.add(change > 0 ? 'stat-increase' : 'stat-decrease');
     setTimeout(() => container.classList.remove('stat-increase', 'stat-decrease'), 500);
+    
+    const statValueElement = document.getElementById(`stat-${key}`);
+    if (statValueElement) {
+        statValueElement.classList.add(change > 0 ? 'stat-value-increase' : 'stat-value-decrease');
+        setTimeout(() => {
+            statValueElement.classList.remove('stat-value-increase', 'stat-value-decrease');
+        }, 500);
+    }
 }
 
 function updateGameState(updates) {
@@ -335,27 +483,70 @@ function updateGameState(updates) {
             const change = newValue - oldValue;
              if (change !== 0) applyStatChangeAnimation(key, change);
         }
+        else if (Array.isArray(oldValue) && Array.isArray(newValue)) {
+            const change = newValue.length - oldValue.length;
+            if (change !== 0) applyStatChangeAnimation(key, change);
+        }
         gameState[key] = newValue;
     });
     updateDisplay();
-    updateAllButtonStates(); // Ensure buttons are updated after any state change
+    updateAllButtonStates();
 }
 
 function updateActions() {
     const actionButtonsContainer = document.getElementById('action-buttons');
     actionButtonsContainer.innerHTML = '';
 
-    let actionKey = (gameState.stage === 'College' && gameState.hasMajored) ? 'College_Majored' : (gameState.career || gameState.stage);
+    let actionKey;
+    if (gameState.stage === 'Retirement') {
+        actionKey = 'Retirement';
+    } else if (gameState.stage === 'College' && gameState.hasMajored) {
+        actionKey = 'College_Majored';
+    } else {
+        actionKey = gameState.career || gameState.stage;
+    }
+    
     let currentActions = [...(gameData.actions[actionKey] || [])];
 
-    // --- DYNAMIC ACTION LOGIC ---
-    if (gameState.stage !== 'Kindergarten' && gameState.stage !== 'Elementary School') {
+    if (gameState.stage !== 'Kindergarten' && gameState.stage !== 'Elementary School' && gameState.stage !== 'Retirement') {
         if (gameState.isMarried) {
             currentActions.push({ name: "File for Divorce", special: "divorce" });
+            currentActions.push({ name: "Have a Child", special: "haveChild", cost: 500 });
         } else if (gameState.hasPartner) {
             currentActions.push({ name: "Propose", special: "propose", cost: 1000 });
         } else {
             currentActions.push({ name: "Try to Find Love", special: "tryToFindLove" });
+        }
+
+        // --- REVISED: Add Asset Purchase Actions ---
+        for (const assetId in gameData.assets) {
+            const asset = gameData.assets[assetId];
+            let canShowButton = true;
+
+            // Check if player meets requirements
+            const meetsRequirements = Object.keys(asset.requirements).every(req => gameState[req] >= asset.requirements[req]);
+            if (!meetsRequirements) {
+                canShowButton = false;
+            }
+
+            // Check if player already owns this specific asset
+            if (gameState.assets.includes(assetId)) {
+                canShowButton = false;
+            }
+
+            // --- BUG FIX: Housing Logic ---
+            // If the asset is a type of housing, check if they already have one.
+            // This prevents "Rent an Apartment" and "Buy a House" from appearing if you already have housing.
+            if (asset.type === 'housing') {
+                const hasHousing = gameState.assets.some(id => gameData.assets[id].type === 'housing');
+                if (hasHousing) {
+                    canShowButton = false;
+                }
+            }
+            
+            if (canShowButton) {
+                currentActions.push({ name: asset.name, special: "buyAsset", specialArg: assetId, cost: asset.cost });
+            }
         }
     }
 
@@ -364,10 +555,12 @@ function updateActions() {
         button.textContent = action.name;
         button.className = "bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200";
         
+        // --- BUG FIX: Store action data on button for energy check ---
+        button.dataset.action = JSON.stringify(action);
+
         button.onclick = () => {
             if (button.disabled) return;
 
-            // Handle career selection (Majors)
             if (action.career) {
                 const careerData = gameData.careers[action.career];
                 if (!careerData) return;
@@ -388,17 +581,15 @@ function updateActions() {
                     updates.hasMajored = true;
                     showMessage(`You have chosen to major in ${action.name.split('in ')[1]}!`, "success");
                     updateGameState(updates);
-                    updateActions(); // Refresh actions immediately
+                    updateActions();
                 } else {
                     const reqText = unmetRequirements.map(req => `${req.charAt(0).toUpperCase() + req.slice(1)}`).join(', ');
                     showMessage(`Your ${reqText} is not high enough for this major.`, "error");
                 }
             } 
-            // Handle special actions (like gambling, finding love, etc.)
             else if (action.special && actionHandlers[action.special]) {
-                actionHandlers[action.special]();
+                actionHandlers[action.special](action.specialArg);
             } 
-            // Handle simple stat-changing actions
             else if (action.effect) {
                 let updates = { ...gameState };
                 updates.money -= (action.cost || 0);
@@ -415,24 +606,85 @@ function updateActions() {
     updateAllButtonStates();
 }
 
+// --- REVISED: Action Disabling Logic ---
 function updateAllButtonStates() {
     const buttons = document.querySelectorAll('#action-buttons button');
     buttons.forEach(button => {
-        let disabled = false; 
-        if(gameState.energy < 20) { // General energy check
+        const actionData = JSON.parse(button.dataset.action || '{}');
+        let disabled = false;
+
+        // Disable if not enough energy for this specific action
+        if (actionData.energyCost && actionData.energyCost > gameState.energy) {
             disabled = true;
         }
+        
+        // Disable if not enough money for this specific action
+        if (actionData.cost && actionData.cost > gameState.money) {
+            disabled = true;
+        }
+
         button.disabled = disabled;
         button.classList.toggle('opacity-50', disabled);
         button.classList.toggle('cursor-not-allowed', disabled);
     });
 }
 
+function triggerRandomEvent() {
+    if (!gameData.events) return;
+    const eventRoll = Math.random();
+    let cumulativeChance = 0;
+    
+    for (const event of gameData.events) {
+        cumulativeChance += event.chance;
+        if (eventRoll < cumulativeChance) {
+            showMessage(event.message, 'info');
+            let updates = { ...gameState };
+            for (let stat in event.effect) {
+                updates[stat] = (updates[stat] || 0) + event.effect[stat];
+            }
+            updateGameState(updates);
+            return;
+        }
+    }
+}
+
 function applyYearlyEffects() {
     let updates = { ...gameState };
     updates.age += 1;
-    updates.energy = 100;
+    updates.energy = 100; // Restore energy at the start of the year
     
+    let totalIncome = 0;
+    let totalExpenses = 0;
+    const salary = (gameState.career && gameData.careers[gameState.career]) ? gameData.careers[gameState.career].levels[gameState.careerLevel].salary : 0;
+    totalIncome += salary;
+
+    for (const expenseId in gameData.expenses) {
+        const expense = gameData.expenses[expenseId];
+        try {
+            if (eval(expense.condition)) {
+                let amount = 0;
+                if (typeof expense.amount === 'string' && expense.amount.includes('%')) {
+                    amount = Math.floor(salary * (parseFloat(expense.amount) / 100));
+                } else if (expense.per === 'child') {
+                    amount = expense.amount * gameState.children.length;
+                } else {
+                    amount = expense.amount;
+                }
+                totalExpenses += amount;
+            }
+        } catch(e) { console.error("Error evaluating expense condition:", e); }
+    }
+    gameState.assets.forEach(assetId => {
+        totalExpenses += gameData.assets[assetId].upkeep;
+    });
+    
+    updates.money += (totalIncome - totalExpenses);
+
+    updates.children = updates.children.map(child => ({ ...child, age: child.age + 1 }));
+    if (updates.children.length > 0) {
+        updates.fun += 5;
+    }
+
     updates.health -= Math.floor((updates.age + 1) / 20);
     updates.fun -= 1;
     updates.relationships -= 1;
@@ -446,9 +698,7 @@ function applyYearlyEffects() {
     if(updates.dietQuality < -20) updates.health -= 5;
 
     if (updates.age < 18) updates.intelligence += 2;
-    if (updates.career && gameData.careers[updates.career]) {
-        updates.money += gameData.careers[updates.career].levels[updates.careerLevel].salary;
-    }
+    
     updateGameState(updates);
 }
 
@@ -456,19 +706,18 @@ function checkStage() {
     const previousStage = gameState.stage;
     let newStage = previousStage;
 
-    if (gameState.stage !== 'Working Adult' || !gameState.career) {
-        for (let stageName in gameData.stages) {
-            const { minAge, maxAge } = gameData.stages[stageName];
-            if (gameState.age >= minAge && (!maxAge || gameState.age <= maxAge)) {
-                newStage = stageName;
-                break;
-            }
+    for (let stageName in gameData.stages) {
+        const { minAge, maxAge } = gameData.stages[stageName];
+        if (gameState.age >= minAge && (!maxAge || gameState.age <= maxAge)) {
+            newStage = stageName;
+            break;
         }
     }
 
     if (newStage !== previousStage) {
         let updates = { ...gameState, stage: newStage };
         showMessage(`You are now in ${newStage}!`, 'success');
+        
         if (newStage === 'Working Adult') {
             if (previousStage === 'College' && gameState.career) {
                 updates.flags = { ...updates.flags, graduated: true };
@@ -477,7 +726,10 @@ function checkStage() {
             if (!gameState.career) {
                 updates.career = 'Unemployed';
             }
+        } else if (newStage === 'Retirement') {
+            showMessage("You have officially retired from your career.", "success");
         }
+
         updateGameState(updates);
         updateActions();
     }
@@ -485,10 +737,19 @@ function checkStage() {
 
 function getSummary() {
     let summaryLines = [];
-    if (gameState.health <= 0) summaryLines.push(`Your journey ended prematurely at age ${gameState.age} due to poor health.`);
-    else summaryLines.push(`You have retired at age ${gameState.age}.`);
+    if (gameState.health <= 0) {
+        summaryLines.push(`Your journey ended prematurely at age ${gameState.age} due to poor health.`);
+    } else {
+        summaryLines.push(`You lived a full life, reaching the age of ${gameState.age}.`);
+    }
     if (gameState.isMarried) summaryLines.push("You were happily married.");
-    if (gameState.money > 10000) summaryLines.push("You were wealthy and lived in luxury.");
+    if (gameState.children.length > 0) {
+        summaryLines.push(`You raised ${gameState.children.length} child${gameState.children.length > 1 ? 'ren' : ''}.`);
+    }
+    if (gameState.assets.some(id => gameData.assets[id].type === 'housing' && gameData.assets[id].cost > 0)) {
+        summaryLines.push("You were a homeowner.");
+    }
+    if (gameState.money > 100000) summaryLines.push("You were wealthy and lived in luxury.");
     else if (gameState.money < 1000) summaryLines.push("You lived with very little to your name.");
     if (gameState.fun > 80) summaryLines.push("Looking back, your life was joyful and fulfilling.");
     else if (gameState.fun < 20) summaryLines.push("Looking back, your life lacked joy and excitement.");
@@ -498,10 +759,11 @@ function getSummary() {
 
 function nextYear() {
     applyYearlyEffects();
+    triggerRandomEvent();
     checkStage();
     updateActions();
 
-    if (gameState.health <= 0 || gameState.age >= 65) {
+    if (gameState.health <= 0 || gameState.age >= 80) {
         endGame();
     }
 }
@@ -522,14 +784,20 @@ function resetGame() {
 
 async function initializeGame() {
     try {
-        const [stagesRes, careersRes, actionsRes] = await Promise.all([
+        const [stagesRes, careersRes, actionsRes, eventsRes, expensesRes, assetsRes] = await Promise.all([
             fetch('scr/data/stages.json'),
             fetch('scr/data/careers.json'),
             fetch('scr/data/actions.json'),
+            fetch('scr/data/events.json'),
+            fetch('scr/data/expenses.json'),
+            fetch('scr/data/assets.json')
         ]);
         gameData.stages = await stagesRes.json();
         gameData.careers = await careersRes.json();
         gameData.actions = await actionsRes.json();
+        gameData.events = await eventsRes.json();
+        gameData.expenses = await expensesRes.json();
+        gameData.assets = await assetsRes.json();
         
         setupStatDisplays();
         updateDisplay();

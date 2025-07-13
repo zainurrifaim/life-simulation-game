@@ -1,0 +1,21 @@
+{
+    "Taxes": {
+        "description": "Income Tax",
+        "type": "recurring",
+        "amount": "15% of salary",
+        "condition": "gameState.career && gameState.career !== 'Unemployed'"
+    },
+    "ChildCare": {
+        "description": "Child Care",
+        "type": "recurring",
+        "amount": 2000,
+        "per": "child",
+        "condition": "gameState.children.length > 0"
+    },
+    "MarriageCosts": {
+        "description": "Marriage Costs",
+        "type": "recurring",
+        "amount": 1000,
+        "condition": "gameState.isMarried"
+    }
+}

@@ -1,0 +1,34 @@
+{
+    "Apartment": {
+        "name": "Rent an Apartment",
+        "type": "housing",
+        "cost": 0,
+        "upkeep": 3000,
+        "effect": {},
+        "requirements": { "age": 18 }
+    },
+    "House": {
+        "name": "Buy a House",
+        "type": "housing",
+        "cost": 100000,
+        "upkeep": 5000,
+        "effect": { "fun": 10 },
+        "requirements": { "age": 25, "money": 100000 }
+    },
+    "UsedCar": {
+        "name": "Buy a Used Car",
+        "type": "vehicle",
+        "cost": 15000,
+        "upkeep": 1500,
+        "effect": { "fun": 5 },
+        "requirements": { "age": 18, "money": 15000 }
+    },
+    "SportsCar": {
+        "name": "Buy a Sports Car",
+        "type": "vehicle",
+        "cost": 75000,
+        "upkeep": 5000,
+        "effect": { "fun": 20 },
+        "requirements": { "age": 25, "money": 75000 }
+    }
+}

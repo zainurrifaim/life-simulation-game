@@ -33,3 +33,20 @@ body {
 .stat-decrease {
     animation: flash-red 0.5s ease-in-out;
 }
+
+.stat-value-increase {
+    color: #10B981; /* green-500 */
+    transition: color 0.5s;
+}
+
+.stat-value-decrease {
+    color: #EF4444; /* red-500 */
+    transition: color 0.5s;
+}
+
+/* --- NEW: Expense Display Styles --- */
+.expense-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.25rem 0;
+}
